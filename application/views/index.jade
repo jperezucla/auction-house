@@ -2,53 +2,40 @@ extends layout
 
 block content
     h1= title
-    p Welcome to our test
+    p WoW Auction House
 
     // Wrapper
     #wrapper
 
-        // USER INFO
-        #userInfo
-            h2 User Info
+        // ITEM INFO
+        #itemInfo
+            h2 Item Info
             p
-                strong Name:
-                |  <span id='userInfoName'></span>
+                strong Id:
+                |  <span id='itemInfoId'></span>
                 br
-                strong Age:
-                |  <span id='userInfoAge'></span>
+                strong Price:
+                |  <span id='itemInfoPrice'></span>
                 br
-                strong Gender:
-                |  <span id='userInfoGender'></span>
-                br
-                strong Location:
-                |  <span id='userInfoLocation'></span>
-        // /USER INFO
+        // /ITEM INFO
 
-        // USER LIST
-        h2 User List
-        #userList
+        // ITEM LIST
+        h2 Item List
+        #itemList
             table
                 thead
-                    th UserName
-                    th Email
-                    th Delete?
+                    th Id
+                    th Price
                 tbody
-        // /USER LIST
+        // /ITEM LIST
 
-        // ADD USER
-        h2 Add User
-        #addUser
+        // ADD ITEM
+        h2 Add Item
+        #addItem
             fieldset
-                input#inputUserName(type='text', placeholder='Username')
-                input#inputUserEmail(type='text', placeholder='Email')
-                br
-                input#inputUserFullname(type='text', placeholder='Full Name')
-                input#inputUserAge(type='text', placeholder='Age')
-                br
-                input#inputUserLocation(type='text', placeholder='Location')
-                input#inputUserGender(type='text', placeholder='gender')
-                br
-                button#btnAddUser Add User
-        // /ADD USER
+                input#inputItemId(type='text', placeholder='ItemId')
+                input#inputItemPrice(type='text', placeholder='ItemPrice')
+                button#btnAddItem Add Item
+        // /ADD ITEM
 
     // /WRAPPER
