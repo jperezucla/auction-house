@@ -5,8 +5,23 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var mongo = require('mongoskin');
-var db = mongo.db("mongodb://localhost:27017/itemdb", {native_parser:true});
+// DB Setup
+var mongoose = require('mongoose');
+var db = mongoose.connection;
+
+db.on('error', console.error);
+db.once('open', function() {
+    var itemSchema = new mongoose.Schema({
+        wowId: Number,
+        price: Number
+    });
+
+    // Compile an 'Item' model using the itemSchema as the structure.
+    // Mongoose also creates a MongoDB collection called 'Items' for these documents.
+    var Item = mongoose.model('Item', itemSchema);
+});
+
+mongoose.connect('mongodb://localhost/test');
 
 var routes = require('./routes/index');
 var items = require('./routes/items');
@@ -25,7 +40,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Make our db accessible to our router
-app.use(function(req,res,next){
+app.use(function(req, res, next) {
     req.db = db;
     next();
 });

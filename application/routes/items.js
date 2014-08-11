@@ -2,17 +2,7 @@ var express = require('express');
 var http = require("http");
 var router = express.Router();
 
-var collectionName = "item_test"
-
-/*var options = {
-    host: 'somesite.com',
-    port: 443,
-    path: '/some/path',
-    method: 'GET',
-    headers: {
-        'Content-Type': 'application/json'
-    }
-};*/
+var mongoose = require('mongoose');
 
 var options = {
     host: 'us.battle.net',
@@ -63,50 +53,93 @@ function extractBatchUrl(err, obj, batchUrl) {
 }
 
 /*
- * GET item info
+ * GET item page
  */
-router.get('/:realm/:faction/:id', function(req, res) {
+router.get('/:realm/:faction/:wowId', function(req, res) {
+
+    var Item = mongoose.model("Item");
+
     var realm = req.params.realm;
     var faction = req.params.faction;
-    var itemId = req.params.id;
+    var itemId = req.params.wowId;
 
-    res.send("Realm: " + realm + ", faction: " + faction + ", itemId: " + itemId);
+    console.log("Realm: " + realm + ", faction: " + faction + ", itemId: " + itemId);
 
-    var batchUrl = '';
-    getBatchUrl(options, extractBatchUrl, batchUrl);
+    Item.find({'wowId': itemId}, function(err, items) {
+        if (err) {
+            res.send(err);
+        }
+
+        var item = items[0];
+        res.json(item);
+    });
+
 });
 
 /*
  * GET item list.
  */
 router.get('/itemlist', function(req, res) {
-    var db = req.db;
+/*    var db = req.db;
     db.collection(collectionName).find().toArray(function(err, items) {
         res.json(items);
+    });*/
+
+    var Item = mongoose.model("Item");
+
+    Item.find({}, function(err, items) {
+        res.json(items);
     });
+
 });
 
-/*
- * POST to additem.
- */
 router.post('/additem', function(req, res) {
-    var db = req.db;
-    db.collection(collectionName).insert(req.body, function(err, result){
-        res.send(
-            (err === null) ? { msg: '' } : { msg: err }
-        );
+    var Item = mongoose.model("Item");
+
+    var obj = req.body;
+    var wowId = obj.wowId;
+    var price = obj.price;
+
+    var item = new Item({
+        wowId: wowId,
+        price: price
     });
+
+    item.save(function(err, item) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(200);
+        }
+    });
+
+    /*
+    var db = req.db;
+
+    db.collection(collectionName).insert(req.body, function(err, result) {
+        res.send(
+            (err === null) ? {
+                msg: ''
+            } : {
+                msg: err
+            }
+        );
+    });*/
 });
 
 /*
  * DELETE to deleteitem.
  */
-router.delete('/deleteitem/:id', function(req, res) {
+/*router.delete('/deleteitem/:id', function(req, res) {
     var db = req.db;
     var itemToDelete = req.params.id;
     db.collection(collectionName).removeById(itemToDelete, function(err, result) {
-        res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
+        res.send((result === 1) ? {
+            msg: ''
+        } : {
+            msg: 'error: ' + err
+        });
     });
-});
+});*/
 
 module.exports = router;

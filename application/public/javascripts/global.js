@@ -29,7 +29,7 @@ function populateTable() {
         // For each item in our JSON, add a table row and cells to the content string
         $.each(data, function() {
             tableContent += '<tr>';
-            tableContent += '<td><a href="#" class="linkshowitem" rel="' + this.id + '" title="Show Details">' + this.id + '</a></td>';
+            tableContent += '<td><a href="#" class="linkshowitem" rel="' + this.wowId + '" title="Show Details">' + this.wowId + '</a></td>';
             tableContent += '<td>' + this.price + '</td>';
             tableContent += '</tr>';
         });
@@ -59,7 +59,7 @@ function showItemInfo(event) {
     var thisItemObject = itemListData[arrayPosition];
 
     //Populate Info Box
-    $('#itemInfoId').text(thisItemObject.id);
+    $('#itemInfoId').text(thisItemObject.wowId);
     $('#itemInfoPrice').text(thisItemObject.price);
 
 };
@@ -79,7 +79,7 @@ function addItem(event) {
 
         // If it is, compile all item info into one object
         var newItem = {
-            'id': $('#addItem fieldset input#inputItemId').val(),
+            'wowId': $('#addItem fieldset input#inputItemId').val(),
             'price': $('#addItem fieldset input#inputItemPrice').val()
         }
 
