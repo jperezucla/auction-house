@@ -80,10 +80,6 @@ router.get('/:realm/:faction/:wowId', function(req, res) {
  * GET item list.
  */
 router.get('/itemlist', function(req, res) {
-/*    var db = req.db;
-    db.collection(collectionName).find().toArray(function(err, items) {
-        res.json(items);
-    });*/
 
     var Item = mongoose.model("Item");
 
@@ -106,17 +102,6 @@ router.post('/additem', function(req, res) {
     });
 
     item.save(function(err, item) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(200);
-        }
-    });
-
-    /*
-    var db = req.db;
-
-    db.collection(collectionName).insert(req.body, function(err, result) {
         res.send(
             (err === null) ? {
                 msg: ''
@@ -124,7 +109,7 @@ router.post('/additem', function(req, res) {
                 msg: err
             }
         );
-    });*/
+    });
 });
 
 /*
