@@ -4,9 +4,12 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 
-var options = {
-    host: 'us.battle.net',
-    path: '/api/wow/auction/data/hyjal',
+var host = 'us.battle.net';
+var batchUrlPath = '/api/wow/auction/data/hyjal';
+
+var baseOptions = {
+    host: host,
+    path: '',
     method: 'GET',
     headers: {
         'Content-Type': 'application/json'
@@ -15,12 +18,14 @@ var options = {
 
 /**
  * @param options: http options object
- * @param callback: callback to pass the results JSON object(s) back
+ * @param onResult: callback to pass the results JSON object(s) back
  */
-function getBatchUrl(options, onResult) {
+function getItemAuctions(options, itemId, onResult) {
     var req = http.request(options, function(res) {
         var output = '';
+
         console.log(options.host + ':' + res.statusCode);
+
         res.setEncoding('utf8');
 
         res.on('data', function(chunk) {
@@ -29,8 +34,12 @@ function getBatchUrl(options, onResult) {
 
         res.on('end', function() {
             var obj = JSON.parse(output);
-            console.log(output);
-            onResult(res.statusCode, obj);
+
+            console.log(obj);
+
+            var items = extractItems(obj, itemId);
+
+            onResult(items);
         });
     });
 
@@ -39,17 +48,50 @@ function getBatchUrl(options, onResult) {
     });
 
     req.end();
-};
+}
 
-function extractBatchUrl(err, obj, batchUrl) {
-    if (obj) {
-        var files = obj.files;
+function extractItems(obj, itemId) {
+    return obj;
+}
 
-        var batchUrl = files[0].url;
-        var timestamp = files[0].lastModified;
+/**
+ * @param options: http options object
+ * @param onResult: callback to pass the results JSON object(s) back
+ */
+function getBatchUrl(options, onResult) {
+    var req = http.request(options, function(res) {
+        var output = '';
 
-        console.log(batchUrl + " " + timestamp);
-    }
+        console.log(options.host + ':' + res.statusCode);
+
+        res.setEncoding('utf8');
+
+        res.on('data', function(chunk) {
+            output += chunk;
+        });
+
+        res.on('end', function() {
+            var obj = JSON.parse(output);
+
+            console.log(obj);
+
+            var batchUrl = extractBatchUrl(obj);
+
+            onResult(batchUrl);
+        });
+    });
+
+    req.on('error', function(err) {
+        res.send('error: ' + err.message);
+    });
+
+    req.end();
+}
+
+function extractBatchUrl(obj) {
+    var files = obj.files;
+
+    return files[0].url;
 }
 
 /*
@@ -65,7 +107,9 @@ router.get('/:realm/:faction/:wowId', function(req, res) {
 
     console.log("Realm: " + realm + ", faction: " + faction + ", itemId: " + itemId);
 
-    Item.find({'wowId': itemId}, function(err, items) {
+    Item.find({
+        'wowId': itemId
+    }, function(err, items) {
         if (err) {
             res.send(err);
         }
@@ -109,6 +153,29 @@ router.post('/additem', function(req, res) {
                 msg: err
             }
         );
+    });
+});
+
+router.get('/', function(req, res) {
+    var batchUrlOptions = baseOptions;
+    baseOptions.path = batchUrlPath;
+
+    getBatchUrl(batchUrlOptions, function(batchUrl) {
+        console.log('Batch url: ' + batchUrl);
+
+        var words = batchUrl.split(host);
+
+        var auctionHousePath = words[1];
+
+        console.log('Auction house path: ' + auctionHousePath);
+
+        var auctionHouseOptions = baseOptions;
+
+        auctionHouseOptions.path = auctionHousePath;
+
+        getItemAuctions(auctionHouseOptions, 76087, function(items) {
+            res.send(items);
+        });
     });
 });
 
