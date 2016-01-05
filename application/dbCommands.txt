@@ -1,7 +1,0 @@
-db commands
-
-use itemdb;
-
-db.item_test.insert( {id: 10, price: 500} )
-
-db.item_test.find( {} )

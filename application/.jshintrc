@@ -1,0 +1,7 @@
+{
+    "indent": 4,
+    "maxerr": 100,
+    "node": true,
+    "undef": true,
+    "unused": true
+}
