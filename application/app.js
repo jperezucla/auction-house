@@ -1,4 +1,5 @@
 'use strict';
+var auction_fetcher = require('./auction_fetcher.js');
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -61,3 +62,5 @@ http.createServer(app).listen(app.get('port'), function()
 {
     console.log('Express server listening on port ' + app.get('port'));
 });
+
+auction_fetcher.init();
